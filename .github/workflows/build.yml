@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:          
           push: true
-          tags: twdotnetregistry.azurecr.io/twapi:${{ github.sha }}
+          tags: twdotnetregistry.azurecr.io/webapplication1:${{ github.sha }}
           file: WebApplication1/Dockerfile
          
 
