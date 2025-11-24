@@ -33,10 +33,10 @@ jobs:
 
       - name: Build and push container image to ACR
         uses: docker/build-push-action@v6
-        with:
-          context: WebApplication1/Dockerfile
+        with:          
           push: true
           tags: twdotnetregistry.azurecr.io/twapi:${{ github.sha }}
+          file: WebApplication1/Dockerfile
          
 
 
