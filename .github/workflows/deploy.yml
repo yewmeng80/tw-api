@@ -1,0 +1,44 @@
+    name: Deploy to Multiple Environments
+
+    on:
+      workflow_run:
+        workflows: ["Build and Push Docker Image"] # Trigger after image build
+        types:
+          - completed
+      workflow_dispatch: # Allow manual triggering
+        inputs:
+          environment:
+            description: 'Select environment to deploy to'
+            required: true
+            default: 'development'
+            type: choice
+            options:
+              - development
+              - staging
+              - production
+
+    jobs:
+      deploy:
+        runs-on: ubuntu-latest
+        environment: ${{ github.event.inputs.environment || 'development' }} # Use selected environment or default
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          #- name: Pull Docker image
+          #  run: docker pull your-docker-username/your-image-name:latest
+
+          - name: Deploy to environment
+            # Replace with your specific deployment commands for each environment
+            # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
+            run: |
+              if [[ "${{ github.event.inputs.environment || 'development' }}" == "production" ]]; then
+                echo "Deploying to production..."
+                # Production-specific deployment commands
+              elif [[ "${{ github.event.inputs.environment || 'development' }}" == "staging" ]]; then
+                echo "Deploying to staging..."
+                # Staging-specific deployment commands
+              else
+                echo "Deploying to development..."
+                # Development-specific deployment commands
+              fi
