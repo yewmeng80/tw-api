@@ -31,12 +31,25 @@ jobs:
           username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
+      - name: Generate Docker Tag
+        id: tag
+        run: |
+          # Example: Using commit SHA as tag
+          DOCKER_TAG=${{ github.sha }}
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_OUTPUT
+          echo "$DOCKER_TAG" > docker_tag.txt     
+
       - name: Build and push container image to ACR
         uses: docker/build-push-action@v6
         with:          
           push: true
-          tags: twdotnetregistry.azurecr.io/webapplication1:${{ github.sha }}
+          tags: twdotnetregistry.azurecr.io/webapplication1:${{ steps.tag.outputs.DOCKER_TAG }}
           file: WebApplication1/Dockerfile
          
+      - name: Upload Docker Tag Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-tag-artifact
+          path: docker_tag.txt
 
 
