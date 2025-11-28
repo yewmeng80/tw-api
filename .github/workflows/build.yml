@@ -51,5 +51,11 @@ jobs:
         with:
           name: docker-tag-artifact
           path: docker_tag.txt
+      
+      - name: Download docker tag artifact
+        uses: actions/download-artifact@v4            
+        with:
+          name: docker-tag-artifact
+          path: ./artifact
 
 
