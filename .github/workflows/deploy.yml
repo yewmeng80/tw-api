@@ -18,38 +18,38 @@
         outputs:
           docker_tag: ${{ steps.set_tag.outputs.docker_tag }}
 
-      steps:
-        - name: Show input
-          run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
+        steps:
+          - name: Show input
+            run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
 
-        # If no inputTag → download artifact
-        - name: Download docker tag artifact
-          if: ${{ github.event.inputs.inputTag == '' }}
-          uses: actions/download-artifact@v4
-          with:
-            name: docker-tag
-            path: ./artifact
+          # If no inputTag → download artifact
+          - name: Download docker tag artifact
+            if: ${{ github.event.inputs.inputTag == '' }}
+            uses: actions/download-artifact@v4
+            with:
+              name: docker-tag
+              path: ./artifact
 
-        - name: Read artifact tag
-          if: ${{ github.event.inputs.inputTag == '' }}
-          id: artifact_tag
-          run: |
-                TAG=$(cat artifact/docker_tag.txt)
-                echo "tag=$TAG" >> $GITHUB_OUTPUT
+          - name: Read artifact tag
+            if: ${{ github.event.inputs.inputTag == '' }}
+            id: artifact_tag
+            run: |
+                  TAG=$(cat artifact/docker_tag.txt)
+                  echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      # Choose final tag
-        - name: Set final docker tag
-          id: set_tag
-          run: |
-                if [ -z "${{ github.event.inputs.inputTag }}" ]; then
-                  FINAL="${{ steps.artifact_tag.outputs.tag }}"
-                else
-                  FINAL="${{ github.event.inputs.inputTag }}"
-                fi
-                echo "docker_tag=$FINAL" >> $GITHUB_OUTPUT
+          # Choose final tag
+          - name: Set final docker tag
+            id: set_tag
+            run: |
+                  if [ -z "${{ github.event.inputs.inputTag }}" ]; then
+                    FINAL="${{ steps.artifact_tag.outputs.tag }}"
+                  else
+                    FINAL="${{ github.event.inputs.inputTag }}"
+                  fi
+                  echo "docker_tag=$FINAL" >> $GITHUB_OUTPUT
 
-        - name: Show final tag
-          run: echo "Final Docker Tag = ${{ steps.set_tag.outputs.docker_tag }}"
+          - name: Show final tag
+            run: echo "Final Docker Tag = ${{ steps.set_tag.outputs.docker_tag }}"
 
       deploy-development:
         needs: get-tag
