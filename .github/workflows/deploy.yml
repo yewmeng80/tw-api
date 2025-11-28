@@ -27,7 +27,7 @@
             if: ${{ github.event.inputs.inputTag == '' }}
             uses: actions/download-artifact@v4            
             with:
-              name: docker-tag-artifact             
+              name: docker-tag-artifact          
               path: ./artifact
               run-id: ${{ github.event.workflow_run.id }}
 
