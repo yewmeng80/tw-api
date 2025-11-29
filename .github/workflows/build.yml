@@ -1,58 +1,15 @@
-name: Build and Push Docker Image
+name: Workflow A
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [main]
 
 jobs:
-  build:
+  producer:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4      
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-         
-      - name: Build with dotnet
-        run: dotnet build --configuration Release  
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3 
-
-      - name: Login to ACR
-        uses: docker/login-action@v3
-        with:
-          registry: twdotnetregistry.azurecr.io
-          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-
-      - name: Generate Docker Tag
-        id: tag
-        run: |
-          # Example: Using commit SHA as tag
-          DOCKER_TAG=${{ github.sha }}
-          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_OUTPUT
-          echo "$DOCKER_TAG" > docker_tag.txt     
-
-      - name: Build and push container image to ACR
-        uses: docker/build-push-action@v6
-        with:          
-          push: true
-          tags: twdotnetregistry.azurecr.io/webapplication1:${{ steps.tag.outputs.DOCKER_TAG }}
-          file: WebApplication1/Dockerfile
-         
-      #- name: Upload Docker Tag Artifact
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: docker-tag-artifact
-      #    path: docker_tag.txt
-
-      - name: Set value
+      - name: Create value file
         run: echo "myvalue=12345" > value.txt
 
       - name: Upload value
@@ -60,6 +17,3 @@ jobs:
         with:
           name: shared-value
           path: value.txt
-      
-
-

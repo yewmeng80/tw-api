@@ -1,96 +1,19 @@
-    name: Deploy to Multiple Environments
+name: Workflow B
 
-    on:
-      workflow_run:
-        workflows: ["Build and Push Docker Image"] # Trigger after image build
-        types:
-          - completed
-      workflow_dispatch:
-        inputs:
-          inputTag:
-            description: "Optional: Docker tag to deploy (leave empty to use artifact)"
-            required: false
-            default: ""
-        
-    jobs:
-      get-tag:
-        runs-on: ubuntu-latest
-        outputs:
-          docker_tag: ${{ steps.set_tag.outputs.docker_tag }}
+on:
+  workflow_run:
+    workflows: [ "Workflow A" ]
+    types: [ completed ]
 
-        steps:
-          - name: Download value
-            uses: actions/download-artifact@v4
-            with:
-              name: shared-value
+jobs:
+  consumer:
+    runs-on: ubuntu-latest
 
-          - name: Read value
-            id: read_value
-            run: echo "val=$(cat value.txt)" >> $GITHUB_OUTPUT
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: shared-value
 
-          #- name: Use value
-          #  run: echo "The value passed from workflow A is: ${{ steps.read_value.outputs.val }}"
-              
-          - name: Show input
-            run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
-
-          # If no inputTag → download artifact
-          - name: Download docker tag artifact
-            if: ${{ github.event.inputs.inputTag == '' }}
-            uses: actions/download-artifact@v4            
-            with:
-              name: docker-tag
-              path: .
-              #run-id: ${{ github.event.workflow_run.id }}
-
-          - name: Read artifact tag
-            if: ${{ github.event.inputs.inputTag == '' }}
-            id: artifact_tag
-            run: | 
-                  TAG=$(cat artifact/docker_tag.txt)
-                  echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-          # Choose final tag
-          - name: Set final docker tag
-            id: set_tag
-            run: |
-                  if [ -z "${{ github.event.inputs.inputTag }}" ]; then
-                    FINAL="${{ steps.artifact_tag.outputs.tag }}"
-                  else
-                    FINAL="${{ github.event.inputs.inputTag }}"
-                  fi
-                  echo "docker_tag=$FINAL" >> $GITHUB_OUTPUT
-
-          - name: Show final tag
-            run: echo "Final Docker Tag = ${{ steps.set_tag.outputs.docker_tag }}"
-
-      deploy-development:
-        needs: get-tag
-        runs-on: ubuntu-latest
-        environment: development # Use selected environment or default
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-
-          #- name: Pull Docker image
-          #  run: docker pull your-docker-username/your-image-name:latest
-
-          - name: Deploy to development
-            # Replace with your specific deployment commands for each environment
-            # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
-            run: echo "Deploying to development...${{ needs.get-tag.outputs.docker_tag }}"
-
-      deploy-staging:
-        runs-on: ubuntu-latest
-        environment: staging # Use selected environment or default
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-
-          #- name: Pull Docker image
-          #  run: docker pull your-docker-username/your-image-name:latest
-
-          - name: Deploy to staging
-            # Replace with your specific deployment commands for each environment
-            # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
-            run: echo "Deploying to production..."
+      - name: Read value
+        run: cat value.txt
