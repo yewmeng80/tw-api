@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      docker_tag: ${{ steps.set_tag.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v4      
@@ -33,44 +31,35 @@ jobs:
           username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
-      #- name: Generate Docker Tag
-      #  id: tag
-      #  run: |
+      - name: Generate Docker Tag
+        id: tag
+        run: |
           # Example: Using commit SHA as tag
-      #    DOCKER_TAG=${{ github.sha }}
-      #    echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_OUTPUT
-      #    echo "$DOCKER_TAG" > docker_tag.txt     
-
-      - name: Set Docker Tag
-        id: set_tag
-        run: echo "${{ github.sha }}" >> $GITHUB_OUTPUT
+          DOCKER_TAG=${{ github.sha }}
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_OUTPUT
+          echo "$DOCKER_TAG" > docker_tag.txt     
 
       - name: Build and push container image to ACR
         uses: docker/build-push-action@v6
         with:          
           push: true
-          tags: twdotnetregistry.azurecr.io/webapplication1:${{ steps.set_tag.outputs.DOCKER_TAG }}
+          tags: twdotnetregistry.azurecr.io/webapplication1:${{ steps.tag.outputs.DOCKER_TAG }}
           file: WebApplication1/Dockerfile
-
-      - name: Upload tag artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-tag
-          path: tag.txt
-
-      - name: Save tag to file
-        run: echo "${{ steps.set_tag.outputs.tag }}" > tag.txt
          
       #- name: Upload Docker Tag Artifact
       #  uses: actions/upload-artifact@v4
       #  with:
       #    name: docker-tag-artifact
       #    path: docker_tag.txt
+
+      - name: Set value
+        run: echo "myvalue=12345" > value.txt
+
+      - name: Upload value
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-value
+          path: value.txt
       
-      #- name: Download docker tag artifact
-      #  uses: actions/download-artifact@v4            
-      #  with:
-      #    name: docker-tag-artifact
-      #    path: ./artifact
 
 

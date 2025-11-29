@@ -19,8 +19,19 @@
           docker_tag: ${{ steps.set_tag.outputs.docker_tag }}
 
         steps:
-          - name: Show input
-            run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
+          - name: Download value
+            uses: actions/download-artifact@v4
+            with:
+              name: shared-value
+
+          - name: Read value
+            id: read_value
+            run: echo "val=$(cat value.txt)" >> $GITHUB_OUTPUT
+
+          - name: Use value
+            run: echo "The value passed from workflow A is: ${{ steps.read_value.outputs.val }}"
+              - name: Show input
+                run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
 
           # If no inputTag → download artifact
           - name: Download docker tag artifact
