@@ -28,8 +28,8 @@
             id: read_value
             run: echo "val=$(cat value.txt)" >> $GITHUB_OUTPUT
 
-          - name: Use value
-            run: echo "The value passed from workflow A is: ${{ steps.read_value.outputs.val }}"
+          #- name: Use value
+          #  run: echo "The value passed from workflow A is: ${{ steps.read_value.outputs.val }}"
               
           - name: Show input
             run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
