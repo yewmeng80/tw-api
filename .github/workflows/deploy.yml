@@ -14,6 +14,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: shared-value
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Read value
         run: cat value.txt
