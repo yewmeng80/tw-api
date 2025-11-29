@@ -1,19 +1,24 @@
-name: Workflow A
+    # .github/workflows/build.yml
+    name: Build Docker Image
 
-on:
-  push:
-    branches: [main]
+    on:
+      push:
+        branches:
+          - main
 
-jobs:
-  producer:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Create value file
-        run: echo "myvalue=12345" > value.txt
-
-      - name: Upload value
-        uses: actions/upload-artifact@v4
-        with:
-          name: shared-value
-          path: value.txt
+    jobs:
+      build:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - name: Build Docker image
+            run: |
+              DOCKER_TAG=$(git rev-parse --short HEAD)
+              echo "Building image with tag: $DOCKER_TAG"
+              docker build -t your-image-name:$DOCKER_TAG .
+              echo $DOCKER_TAG > docker_tag.txt
+          - name: Upload Docker tag artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: docker-tag
+              path: docker_tag.txt

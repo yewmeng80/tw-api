@@ -1,20 +1,30 @@
-name: Workflow B
+    # .github/workflows/deploy.yml
+    name: Deploy Application
 
-on:
-  workflow_run:
-    workflows: [ "Workflow A" ]
-    types: [ completed ]
+    on:
+      workflow_run:
+        workflows: ["Build Docker Image"]
+        types:
+          - completed
 
-jobs:
-  consumer:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: shared-value
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - name: Read value
-        run: cat value.txt
+    jobs:
+      deploy:
+        runs-on: ubuntu-latest
+        #needs: build # If using a single workflow with multiple jobs
+        steps:
+          - uses: actions/checkout@v4
+          - name: Download Docker tag artifact
+            uses: actions/download-artifact@v4
+            with:
+              name: docker-tag
+          - name: Read Docker tag
+            id: get_tag
+            run: echo "DOCKER_TAG=$(cat docker_tag.txt)" >> $GITHUB_OUTPUT
+          - name: Deploy Docker image
+            env:
+              DOCKER_TAG: ${{ steps.get_tag.outputs.DOCKER_TAG }}
+            run: |
+              echo "Deploying image with tag: $DOCKER_TAG"
+              # Add your deployment commands here, using $DOCKER_TAG
+              # e.g., docker pull your-image-name:$DOCKER_TAG
+              # e.g., kubectl apply -f deployment.yaml --set image=your-image-name:$DOCKER_TAG
