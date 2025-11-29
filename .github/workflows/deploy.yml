@@ -30,8 +30,9 @@
 
           - name: Use value
             run: echo "The value passed from workflow A is: ${{ steps.read_value.outputs.val }}"
-              - name: Show input
-                run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
+              
+          - name: Show input
+            run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
 
           # If no inputTag → download artifact
           - name: Download docker tag artifact
