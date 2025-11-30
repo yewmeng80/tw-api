@@ -58,6 +58,7 @@ jobs:
           path: docker_tag.txt      
 
   get-tag:
+    needs: build
     runs-on: ubuntu-latest
     outputs:
       docker_tag: ${{ steps.set_tag.outputs.docker_tag }}
