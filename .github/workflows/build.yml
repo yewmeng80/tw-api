@@ -55,13 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-tag-artifact
-          path: docker_tag.txt
-      
-      - name: Download docker tag artifact
-        uses: actions/download-artifact@v4            
-        with:
-          name: docker-tag-artifact
-          path: ./artifact
+          path: docker_tag.txt      
 
   get-tag:
     runs-on: ubuntu-latest
@@ -73,11 +67,17 @@ jobs:
         run: echo "Input Tag = '${{ github.event.inputs.inputTag }}'"
 
       # If no inputTag → download artifact
+      #- name: Download docker tag artifact
+      #  if: ${{ github.event.inputs.inputTag == '' }}
+      #  uses: actions/download-artifact@v4            
+      #  with:
+      #    name: docker-tag-artifact          
+      #    path: ./artifact
+
       - name: Download docker tag artifact
-        if: ${{ github.event.inputs.inputTag == '' }}
         uses: actions/download-artifact@v4            
         with:
-          name: docker-tag-artifact          
+          name: docker-tag-artifact
           path: ./artifact
 
       - name: Read artifact tag
