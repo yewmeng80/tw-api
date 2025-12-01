@@ -124,6 +124,10 @@ jobs:
     needs: deploy-staging
     runs-on: ubuntu-latest
     environment: uat # Use selected environment or default
+    permissions:      # ⬅️ REQUIRED HERE
+      id-token: write
+      contents: read
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
