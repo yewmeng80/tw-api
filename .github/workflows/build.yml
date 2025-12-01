@@ -104,10 +104,10 @@ jobs:
       - name: Show final tag
         run: echo "Final Docker Tag = ${{ steps.set_tag.outputs.docker_tag }}"
 
-  deploy-development:
+  deploy-staging:
     needs: get-tag
     runs-on: ubuntu-latest
-    environment: development # Use selected environment or default
+    environment: staging # Use selected environment or default
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -115,26 +115,38 @@ jobs:
         #- name: Pull Docker image
         #  run: docker pull your-docker-username/your-image-name:latest
 
-      - name: Deploy to development
+      - name: Deploy to staging
           # Replace with your specific deployment commands for each environment
           # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
-        run: echo "Deploying to development...${{ needs.get-tag.outputs.docker_tag }}"
+        run: echo "Deploying to staging...${{ needs.get-tag.outputs.docker_tag }}"
  
   deploy-uat:
-    needs: deploy-development
+    needs: deploy-staging
     runs-on: ubuntu-latest
     environment: uat # Use selected environment or default
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-        #- name: Pull Docker image
-        #  run: docker pull your-docker-username/your-image-name:latest
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to uat
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          resourceGroup: rg-ca
+          containerAppName: twapi-stg
+          imageToDeploy: twdotnetregistry.azurecr.io/webapplication1:${{ needs.get-tag.outputs.docker_tag }}
+
+      #- name: Deploy to uat
           # Replace with your specific deployment commands for each environment
           # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
-        run: echo "Deploying to uat...${{ needs.get-tag.outputs.docker_tag }}"
+       # run: | 
+       #       echo "Deploying to uat...${{ needs.get-tag.outputs.docker_tag }}"
 
   deploy-production:
     needs: deploy-uat
