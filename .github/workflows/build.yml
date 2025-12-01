@@ -121,12 +121,12 @@ jobs:
         run: echo "Deploying to staging...${{ needs.get-tag.outputs.docker_tag }}"
  
   deploy-uat:
-    needs: deploy-staging
+    needs: get-tag
     runs-on: ubuntu-latest
     environment: uat # Use selected environment or default
-    permissions:      # ⬅️ REQUIRED HERE
-      id-token: write
-      contents: read
+    #permissions:      # ⬅️ REQUIRED HERE
+    #  id-token: write
+    #  contents: read
       
     steps:
       - name: Checkout code
