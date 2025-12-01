@@ -119,5 +119,36 @@ jobs:
           # Replace with your specific deployment commands for each environment
           # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
         run: echo "Deploying to development...${{ needs.get-tag.outputs.docker_tag }}"
+ 
+  deploy-uat:
+    needs: deploy-uat
+    runs-on: ubuntu-latest
+    environment: uat # Use selected environment or default
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+        #- name: Pull Docker image
+        #  run: docker pull your-docker-username/your-image-name:latest
+
+      - name: Deploy to uat
+          # Replace with your specific deployment commands for each environment
+          # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
+        run: echo "Deploying to uat...${{ needs.get-tag.outputs.docker_tag }}"
+
+  deploy-production:
+    needs: deploy-uat
+    runs-on: ubuntu-latest
+    environment: production # Use selected environment or default
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+        #- name: Pull Docker image
+        #  run: docker pull your-docker-username/your-image-name:latest
+
+      - name: Deploy to production
+          # Replace with your specific deployment commands for each environment
+          # This could involve SSHing to a server, updating a Kubernetes deployment, etc.
+        run: echo "Deploying to production...${{ needs.get-tag.outputs.docker_tag }}"
 
