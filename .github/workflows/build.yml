@@ -121,7 +121,7 @@ jobs:
         run: echo "Deploying to development...${{ needs.get-tag.outputs.docker_tag }}"
  
   deploy-uat:
-    needs: deploy-uat
+    needs: deploy-development
     runs-on: ubuntu-latest
     environment: uat # Use selected environment or default
     steps:
